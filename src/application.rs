@@ -4,7 +4,7 @@ use crate::application::flash::{flash, Flash};
 use crate::application::font::{with_gamepad_font, GAMEPAD_FONT_SYMBOL};
 use crate::application::output::{output, Output};
 use crate::application::test_commands::test_commands;
-use crate::dual_shock_4::DualShock4;
+use crate::dual_shock_4::{DualShock4, TestCommand, TestData};
 use device_info::DeviceInfo;
 use eframe::egui::panel::{Side, TopBottomSide};
 use eframe::egui::{Color32, Context, FontFamily, Response, RichText, ScrollArea};
@@ -126,7 +126,7 @@ enum Panel {
     Output(Output),
     Calibration(calibration::Panel),
     Flash(Flash),
-    Test,
+    Test(Option<TestData>, Option<String>),
 }
 
 #[derive(Clone)]
@@ -396,10 +396,16 @@ impl Application {
             if panel_switch_button(ui, matches!(&state.panel, Panel::Flash(_)), "Flash").clicked() {
                 state.panel = Panel::Flash(Flash::default());
             }
-            if panel_switch_button(ui, matches!(&state.panel, Panel::Test), "Test Commands")
-                .clicked()
+            if panel_switch_button(
+                ui,
+                matches!(&state.panel, Panel::Test(_, _)),
+                "Test Commands",
+            )
+            .clicked()
             {
-                state.panel = Panel::Test;
+                let ConnectedDevice::DualShock4(_, ds4) = &state.device;
+                let test_data = sh.handle_error(ds4.read_test_data());
+                state.panel = Panel::Test(test_data, None);
             }
         });
     }
@@ -415,7 +421,7 @@ impl Application {
             Panel::Output(_) => output(ui, ctx, state, sh.clone()),
             Panel::Calibration(_) => calibration(ui, ctx, state, sh.clone()),
             Panel::Flash(_) => flash(ui, ctx, state, sh.clone()),
-            Panel::Test => test_commands(ui, ctx, state, sh.clone()),
+            Panel::Test(_, _) => test_commands(ui, ctx, state, sh.clone()),
             _ => {
                 ui.label("Unknown panel");
             }

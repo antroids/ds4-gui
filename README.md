@@ -7,6 +7,10 @@ Tested on single hardware with the single firmware version, it might be better t
 > [!WARNING]
 > You can brick your controller
 
+## Requirements
+* DualShock 4 connected via USB
+* Linux, tested on KDE Neon 5.27, based on Ubuntu 22.04 LTS
+
 ## How to run
 * Install Cargo: https://rustup.rs/
 * Run `cargo run`

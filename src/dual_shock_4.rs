@@ -14,6 +14,7 @@ const CALIBRATION_FLAG_SIZE: usize = 4;
 const CALIBRATION_STATE_SIZE: usize = 3;
 const CALIBRATION_RESULT_SIZE: usize = 3;
 const CALIBRATION_DATA_SIZE: usize = 13;
+const TEST_DATA_SIZE: usize = 13;
 
 pub const TRIGGER_MIN_MAX_CALIBRATION_SAMPLES: u16 = 0x04E2;
 
@@ -135,6 +136,43 @@ impl DualShock4 {
         self.send_report(command.into())
     }
 
+    pub fn read_test_data(&self) -> Result<TestData> {
+        let mut data: Vec<u8> = Vec::new();
+        let mut last_args = [255u8, 255u8];
+
+        loop {
+            let report = self.get_report(ReportId::GetTestData, TEST_DATA_SIZE)?;
+            let payload = report.payload();
+            let chunks = payload[2];
+            let current_chunk = payload[3];
+            let data_len = payload[4];
+            let args = [payload[0], payload[1]];
+
+            if args[0] == 255 {
+                break;
+            } else if last_args[0] != 255 && last_args != args {
+                return Err(format!(
+                    "Mismatch Test Data Arguments Type: {:?}  {:?}",
+                    last_args, args
+                )
+                .into());
+            }
+            if data_len > 8 {
+                return Err(format!("Invalid Test Data chunk len {}", data_len).into());
+            }
+            data.extend_from_slice(&payload[5usize..(5 + data_len) as usize]);
+            last_args = args;
+            if current_chunk + 1 >= chunks {
+                break;
+            }
+        }
+
+        Ok(TestData {
+            args: last_args,
+            data,
+        })
+    }
+
     pub fn read_calibration_data(&self) -> Result<CalibrationData> {
         let mut data: Vec<u8> = Vec::new();
         let mut last_device = CalibrationDeviceType::None;
@@ -147,7 +185,7 @@ impl DualShock4 {
             let data_len = payload[4];
             let device = [payload[0], payload[1], 0x00, 0x00].try_into()?;
 
-            if device == CalibrationDeviceType::None || current_chunk > chunks - 1 {
+            if device == CalibrationDeviceType::None {
                 break;
             } else if last_device != CalibrationDeviceType::None && last_device != device {
                 return Err(
@@ -159,6 +197,9 @@ impl DualShock4 {
             }
             data.extend_from_slice(&payload[5usize..(5 + data_len) as usize]);
             last_device = device;
+            if current_chunk + 1 >= chunks {
+                break;
+            }
         }
 
         Ok(match last_device {
@@ -977,7 +1018,10 @@ impl From<FactoryCommand> for [u8; 3] {
 pub enum TestCommand {
     SetPermanent(bool),
     RecordTriggerMinMax(TriggerKeyLeftRight, bool),
-    ReloadTriggerMinMaxFromFlash,
+    ReadTriggerMinMaxFromFlash,
+    ResetDevice,
+
+    BrickYourDevice(Vec<u8>),
 }
 
 impl From<TestCommand> for Report {
@@ -1003,10 +1047,33 @@ impl From<TestCommand> for Report {
             TestCommand::RecordTriggerMinMax(TriggerKeyLeftRight::Both, false) => {
                 vec![0x08, 0x01, 0x00, 0x00]
             }
-            TestCommand::ReloadTriggerMinMaxFromFlash => vec![0x08, 0x02],
+            TestCommand::ReadTriggerMinMaxFromFlash => vec![0x08, 0x02],
+            TestCommand::ResetDevice => vec![0x04, 0x01],
+            TestCommand::BrickYourDevice(vec) => vec,
             _ => panic!("Unsupported test command"),
         };
         Report::from_payload(ReportId::SetTestCommand, payload.as_slice())
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct TestData {
+    args: [u8; 2],
+    data: Vec<u8>,
+    // [0] - first  a0 arg
+    // [1] - second a0 arg
+    // [2] - test data chunks
+    // [3] - test data chunk index
+    // [4] - test data size (0..=8)
+    // [5] - test data array[8]
+}
+
+impl TestData {
+    pub fn args(&self) -> [u8; 2] {
+        self.args
+    }
+    pub fn data(&self) -> &Vec<u8> {
+        &self.data
     }
 }
 
