@@ -136,6 +136,12 @@ impl DualShock4 {
         self.send_report(command.into())
     }
 
+    pub fn send_custom_report(&self, report: &[u8]) -> Result<()> {
+        self.hid_device.send_feature_report(report)?;
+        info!("Report sent: {:?}", report);
+        Ok(())
+    }
+
     pub fn read_test_data(&self) -> Result<TestData> {
         let mut data: Vec<u8> = Vec::new();
         let mut last_args = [255u8, 255u8];

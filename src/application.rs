@@ -126,7 +126,7 @@ enum Panel {
     Output(Output),
     Calibration(calibration::Panel),
     Flash(Flash),
-    Test(Option<TestData>, Option<String>),
+    Test(Option<TestData>, Option<String>, Option<String>),
 }
 
 #[derive(Clone)]
@@ -398,14 +398,14 @@ impl Application {
             }
             if panel_switch_button(
                 ui,
-                matches!(&state.panel, Panel::Test(_, _)),
+                matches!(&state.panel, Panel::Test(_, _, _)),
                 "Test Commands",
             )
             .clicked()
             {
                 let ConnectedDevice::DualShock4(_, ds4) = &state.device;
                 let test_data = sh.handle_error(ds4.read_test_data());
-                state.panel = Panel::Test(test_data, None);
+                state.panel = Panel::Test(test_data, None, None);
             }
         });
     }
@@ -421,7 +421,7 @@ impl Application {
             Panel::Output(_) => output(ui, ctx, state, sh.clone()),
             Panel::Calibration(_) => calibration(ui, ctx, state, sh.clone()),
             Panel::Flash(_) => flash(ui, ctx, state, sh.clone()),
-            Panel::Test(_, _) => test_commands(ui, ctx, state, sh.clone()),
+            Panel::Test(_, _, _) => test_commands(ui, ctx, state, sh.clone()),
             _ => {
                 ui.label("Unknown panel");
             }
