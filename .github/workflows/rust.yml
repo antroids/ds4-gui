@@ -16,5 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install packages
+      run: sudo apt-get -y install gtk3-devel
     - name: Build
       run: cargo build -r --verbose
