@@ -1,3 +1,6 @@
+// Copyright 2023 Anton Kharuzhyi <publicantroids@gmail.com>
+// SPDX-License-Identifier: GPL-3.0
+
 use crate::application::font::{
     with_gamepad_font, GAMEPAD_FONT_CIRCLE, GAMEPAD_FONT_CROSS, GAMEPAD_FONT_SQUARE,
     GAMEPAD_FONT_TRIANGLE,

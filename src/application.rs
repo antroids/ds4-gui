@@ -1,3 +1,6 @@
+// Copyright 2023 Anton Kharuzhyi <publicantroids@gmail.com>
+// SPDX-License-Identifier: GPL-3.0
+
 use crate::application::calibration::calibration;
 use crate::application::device_info::device_info;
 use crate::application::flash::{flash, Flash};

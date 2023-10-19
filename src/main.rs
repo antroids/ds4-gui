@@ -1,3 +1,6 @@
+// Copyright 2023 Anton Kharuzhyi <publicantroids@gmail.com>
+// SPDX-License-Identifier: GPL-3.0
+
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use crate::application::Application;

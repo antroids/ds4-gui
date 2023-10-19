@@ -1,3 +1,6 @@
+// Copyright 2023 Anton Kharuzhyi <publicantroids@gmail.com>
+// SPDX-License-Identifier: GPL-3.0
+
 use crate::application;
 use crate::application::{ConnectedDevice, UNDEFINED_STRING};
 use eframe::egui;

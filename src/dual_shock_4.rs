@@ -1,3 +1,6 @@
+// Copyright 2023 Anton Kharuzhyi <publicantroids@gmail.com>
+// SPDX-License-Identifier: GPL-3.0
+
 use crate::dual_shock_4::hid_report::{Report, ReportId};
 use hidapi::{HidDevice, HidError};
 use log::info;

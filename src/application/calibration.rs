@@ -1,3 +1,6 @@
+// Copyright 2023 Anton Kharuzhyi <publicantroids@gmail.com>
+// SPDX-License-Identifier: GPL-3.0
+
 use crate::application::font::{
     button_cross, button_triangle, with_gamepad_font, GAMEPAD_FONT_LEFT_ANALOG_CLOCKWISE,
     GAMEPAD_FONT_RIGHT_ANALOG_CLOCKWISE,

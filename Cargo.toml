@@ -2,6 +2,8 @@
 name = "ds4-gui"
 version = "0.1.0"
 edition = "2021"
+license = "GPL-3.0"
+authors = ["Anton Kharuzhyi <publicantroids@gmail.com>"]
 description = "Utilities to test and calibrate DualShock 4 controllers"
 
 [dependencies]
