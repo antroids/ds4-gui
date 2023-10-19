@@ -142,6 +142,13 @@ impl DualShock4 {
         Ok(())
     }
 
+    pub fn get_custom_report(&self, report: &[u8]) -> Result<Vec<u8>> {
+        let mut buf = report.clone().to_vec();
+        self.hid_device.get_feature_report(buf.as_mut_slice())?;
+        info!("Report get: {:?}", buf);
+        Ok(buf)
+    }
+
     pub fn read_test_data(&self) -> Result<TestData> {
         let mut data: Vec<u8> = Vec::new();
         let mut last_args = [255u8, 255u8];
@@ -234,6 +241,7 @@ impl DualShock4 {
                 calibration.buf.append(&mut data);
                 CalibrationData::Triggers(calibration)
             }
+            CalibrationDeviceType::None => CalibrationData::None(data),
             _ => {
                 info!("Calibration data slice: {:?}", data);
                 todo!()
@@ -971,6 +979,7 @@ pub enum CalibrationData {
     StickCenter(StickCenterCalibration, Vec<StickCenterCalibration>),
     StickMinMax(StickMinMaxCalibration),
     Triggers(TriggersCalibration),
+    None(Vec<u8>),
 }
 
 #[derive(Debug, PartialEq, Clone)]

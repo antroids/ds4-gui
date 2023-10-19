@@ -55,6 +55,10 @@ pub fn test_commands(
                 let _ = sh.handle_error(ds4.send_custom_report(decoded.as_slice()));
                 update_test_data_required = true;
             }
+        } else if ui.button("Get Custom Report").clicked() {
+            if let Ok(decoded) = hex::decode(custom_report) {
+                let _ = sh.handle_error(ds4.get_custom_report(decoded.as_slice()));
+            }
         }
     }
     if let Some(ds4_data) = sh.handle_error(ds4.read_last_data()).flatten() {

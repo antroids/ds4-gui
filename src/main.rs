@@ -6,27 +6,40 @@ use log::LevelFilter;
 use simplelog::{ColorChoice, CombinedLogger, Config, TermLogger, TerminalMode, WriteLogger};
 use std::fs;
 use std::fs::File;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::str::FromStr;
 
 mod application;
 mod dual_shock_4;
+
+const APPLICATION_DIR: &str = "ds4-gui";
+const LOG_FILE_NAME: &str = "ds4-gui.log";
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
     #[arg(short, long)]
-    log: Option<String>,
+    log_dir: Option<String>,
 }
 
 fn main() -> application::Result<()> {
     let args = Args::parse();
-    let log_file = args.log.unwrap_or("ds4-gui.log".to_string());
+    let default_log_dir = dirs::data_local_dir().unwrap().join(APPLICATION_DIR);
 
-    if Path::new(log_file.clone().as_str()).exists() {
+    let log_dir = args
+        .log_dir
+        .unwrap_or(default_log_dir.to_str().unwrap().to_string());
+    let log_dir = Path::new(&log_dir);
+    if !log_dir.exists() {
+        fs::create_dir_all(&log_dir).expect("Cannot create log dir");
+    }
+    let log_file = log_dir.join(LOG_FILE_NAME);
+    if log_file.exists() {
         for i in 0u16..999 {
-            let rename_to = format!("{}{}", log_file.clone(), i);
-            if !Path::new(rename_to.as_str()).exists() {
-                fs::rename(log_file.clone(), rename_to).unwrap();
+            let mut rename_to = log_file.clone();
+            rename_to.set_extension(i.to_string());
+            if !rename_to.exists() {
+                fs::rename(&log_file, rename_to).unwrap();
                 break;
             }
         }

@@ -249,6 +249,15 @@ fn start_calibration_buttons(ui: &mut egui::Ui, state: &mut DeviceConnected, sh:
             )));
             panel_update_required = false;
         }
+        if ui.button("Force Read Calibration Data").clicked() {
+            if let Some(calibration_data) = sh.handle_error(ds4.read_calibration_data()) {
+                state.panel = super::Panel::Calibration(Panel::Wizard(CalibrationWizard::Success(
+                    CalibrationDeviceType::None,
+                    calibration_data,
+                )));
+            }
+            panel_update_required = false;
+        }
         if panel_update_required {
             update_calibration_wizard_panel(state, sh.clone());
         }
@@ -276,6 +285,10 @@ fn calibration_data_form(ui: &mut egui::Ui, calibration_data: &CalibrationData) 
             CalibrationData::Triggers(calibration) => {
                 ui.label("Calibration data: ");
                 ui.label(hex::encode(calibration.buf.as_slice()));
+            }
+            CalibrationData::None(data) => {
+                ui.label("Unknown calibration data: ");
+                ui.label(hex::encode(data));
             }
         });
     });

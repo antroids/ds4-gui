@@ -6,9 +6,19 @@ description = "Utilities to test and calibrate DualShock 4 controllers"
 
 [dependencies]
 clap = { version = "4.4.3", features = ["derive", "cargo", "env"] }
+dirs = "5.0.1"
 eframe = "0.22.0"
 hex = "0.4.3"
 hidapi = "2.4.1"
 log = "0.4.20"
 rfd = "0.11.4"
 simplelog = "0.12.1"
+
+[package.metadata.deb]
+depends = "libxcb-render0-dev, libxcb-shape0-dev, libxcb-xfixes0-dev, libxkbcommon-dev, libssl-dev"
+section = "utility"
+priority = "optional"
+assets = [
+    ["target/release/ds4-gui", "usr/bin/", "755"],
+    ["README.md", "usr/share/doc/ds4-gui/README", "644"],
+]
