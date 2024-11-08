@@ -8,7 +8,6 @@ use crate::application::font::{
 use crate::application::{ConnectedDevice, DeviceConnected, StatusHandler};
 use crate::dual_shock_4::{TestCommand, TriggerKeyLeftRight};
 use eframe::egui;
-use std::fmt::format;
 
 pub fn test_commands(
     ui: &mut egui::Ui,

@@ -29,10 +29,10 @@ pub fn with_gamepad_font(text: &str) -> RichText {
     RichText::from(text).family(FontFamily::Name(GAMEPAD_FONT_FAMILY.into()))
 }
 
-pub fn button_cross(text: impl Into<WidgetText>) -> egui::widgets::Button {
+pub fn button_cross(text: impl Into<WidgetText>) -> egui::widgets::Button<'static> {
     egui::widgets::Button::new(text).shortcut_text(with_gamepad_font(GAMEPAD_FONT_CROSS))
 }
 
-pub fn button_triangle(text: impl Into<WidgetText>) -> egui::widgets::Button {
+pub fn button_triangle(text: impl Into<WidgetText>) -> egui::widgets::Button<'static> {
     egui::widgets::Button::new(text).shortcut_text(with_gamepad_font(GAMEPAD_FONT_TRIANGLE))
 }

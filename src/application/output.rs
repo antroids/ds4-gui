@@ -6,7 +6,7 @@ use crate::application::font::*;
 use crate::application::{ConnectedDevice, DeviceConnected, Panel, StatusHandler};
 use crate::dual_shock_4::{DPadState, Data, StickPosition};
 use eframe::egui;
-use eframe::egui::plot::{Line, Plot, PlotPoints, Points};
+use egui_plot::{Line, Plot, PlotPoints, Points};
 use eframe::egui::{remap, Color32, RichText, WidgetText};
 use std::f64::consts::{PI, TAU};
 use std::i16;
@@ -239,7 +239,7 @@ pub fn d_pad_label<'a>(state: DPadState) -> impl egui::Widget + 'a {
                     DPadState::Up => "⬆",
                     DPadState::Released => unreachable!(),
                 })
-                .size(80f32),
+                    .size(80f32),
             )
         }
     }

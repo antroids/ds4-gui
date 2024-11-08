@@ -14,8 +14,8 @@ use crate::dual_shock_4::{
     TriggerKeyLeftRight,
 };
 use eframe::egui;
-use eframe::egui::plot::Points;
-use eframe::egui::{Color32, ScrollArea};
+use eframe::egui::{Color32, ScrollArea, SliderClamping};
+use egui_plot::Points;
 
 #[derive(Clone)]
 pub enum Panel {
@@ -62,7 +62,7 @@ pub fn calibration(
             matches!(state.panel, super::Panel::Calibration(Panel::Info(_))),
             "Calibration Info",
         )
-        .clicked()
+            .clicked()
         {
             if let Some(panel) = Panel::info_from_device_connected(state, sh.clone()) {
                 state.panel = super::Panel::Calibration(panel);
@@ -73,7 +73,7 @@ pub fn calibration(
             matches!(state.panel, super::Panel::Calibration(Panel::Wizard(_))),
             "Calibration Wizard",
         )
-        .clicked()
+            .clicked()
         {
             update_calibration_wizard_panel(state, sh.clone());
         }
@@ -85,7 +85,7 @@ pub fn calibration(
             ),
             "Motion Sensor",
         )
-        .clicked()
+            .clicked()
         {
             let ConnectedDevice::DualShock4(_, ds4) = &state.device;
             if let Some(calibration_from_device) =
@@ -157,11 +157,11 @@ fn calibration_wizard_panel(state: &mut DeviceConnected) -> super::Result<Calibr
 
     Ok(match calibration_state {
         CalibrationState::Started(CalibrationDeviceType::AnalogStick(
-            AnalogStickCalibrationType::Center,
-        )) => CalibrationWizard::AnalogStickCenter,
+                                      AnalogStickCalibrationType::Center,
+                                  )) => CalibrationWizard::AnalogStickCenter,
         CalibrationState::Started(CalibrationDeviceType::AnalogStick(
-            AnalogStickCalibrationType::MinMax,
-        )) => CalibrationWizard::AnalogStickMinMax,
+                                      AnalogStickCalibrationType::MinMax,
+                                  )) => CalibrationWizard::AnalogStickMinMax,
         CalibrationState::Started(CalibrationDeviceType::TriggerKey(_)) => {
             CalibrationWizard::TriggerKey(TriggerKeyCalibrationType::RecordMaxSample(
                 TriggerKeyLeftRight::Both,
@@ -188,9 +188,9 @@ fn calibration_wizard_start(ui: &mut egui::Ui, state: &mut DeviceConnected, sh: 
 
 fn calibration_success(ui: &mut egui::Ui, state: &mut DeviceConnected, sh: StatusHandler) {
     if let super::Panel::Calibration(Panel::Wizard(CalibrationWizard::Success(
-        calibration_device_type,
-        calibration_data,
-    ))) = &state.panel
+                                                       calibration_device_type,
+                                                       calibration_data,
+                                                   ))) = &state.panel
     {
         ui.horizontal(|ui| {
             match calibration_device_type {
@@ -638,7 +638,7 @@ fn stick_preview_plot<'a>(
     move |ui: &mut egui::Ui| {
         ui.vertical_centered(|ui| {
             ui.label(title);
-            egui::plot::Plot::new(title)
+            egui_plot::Plot::new(title)
                 .view_aspect(1f32)
                 .include_x(-1.1f64)
                 .include_x(1.1f64)
@@ -658,13 +658,13 @@ fn stick_preview_plot<'a>(
                 })
                 .response
         })
-        .response
+            .response
     }
 }
 
 fn center_calibration_slider<'a>(value: &'a mut i16, text: &'a str) -> egui::Slider<'a> {
     egui::Slider::new(value, -512i16..=512i16)
-        .clamp_to_range(true)
+        .clamping(SliderClamping::Always)
         .text(text)
         .logarithmic(true)
         .step_by(1f64)
@@ -672,7 +672,7 @@ fn center_calibration_slider<'a>(value: &'a mut i16, text: &'a str) -> egui::Sli
 
 fn min_calibration_slider<'a>(value: &'a mut i16, text: &'a str) -> egui::Slider<'a> {
     egui::Slider::new(value, -4048i16..=0i16)
-        .clamp_to_range(true)
+        .clamping(SliderClamping::Always)
         .text(text)
         .logarithmic(false)
         .step_by(1f64)
@@ -680,7 +680,7 @@ fn min_calibration_slider<'a>(value: &'a mut i16, text: &'a str) -> egui::Slider
 
 fn max_calibration_slider<'a>(value: &'a mut i16, text: &'a str) -> egui::Slider<'a> {
     egui::Slider::new(value, 0i16..=4048i16)
-        .clamp_to_range(true)
+        .clamping(SliderClamping::Always)
         .text(text)
         .logarithmic(false)
         .step_by(1f64)

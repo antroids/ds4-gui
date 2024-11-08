@@ -10,7 +10,7 @@ use crate::application::test_commands::test_commands;
 use crate::dual_shock_4::{DualShock4, TestCommand, TestData};
 use device_info::DeviceInfo;
 use eframe::egui::panel::{Side, TopBottomSide};
-use eframe::egui::{Color32, Context, FontFamily, Response, RichText, ScrollArea};
+use eframe::egui::{Color32, Context, FontFamily, Response, RichText, ScrollArea, ViewportBuilder};
 use eframe::{egui, Frame};
 use font::GAMEPAD_FONT_FAMILY;
 use hidapi::{HidApi, HidError};
@@ -203,14 +203,14 @@ impl Application {
 
     pub fn show() -> Result<()> {
         let options = eframe::NativeOptions {
-            initial_window_size: Some(egui::vec2(800.0, 800.0)),
+            viewport: ViewportBuilder::default().with_resizable(true).with_inner_size((800.0, 800.0)),
             ..Default::default()
         };
 
         let _ = eframe::run_native(
             "DS4 Utils",
             options,
-            Box::new(|cc| Box::new(Application::new(cc).unwrap())),
+            Box::new(|cc| Ok(Box::new(Application::new(cc).unwrap()))),
         )?;
         Ok(())
     }
@@ -371,7 +371,7 @@ impl Application {
                 matches!(&state.panel, Panel::DeviceInfo(_)),
                 "Device Info",
             )
-            .clicked()
+                .clicked()
             {
                 if let Some(device_info) =
                     sh.handle_error(DeviceInfo::from_connected_device(&state.device))
@@ -388,7 +388,7 @@ impl Application {
                 matches!(&state.panel, Panel::Calibration(_)),
                 "Calibration",
             )
-            .clicked()
+                .clicked()
             {
                 if let Some(panel) =
                     calibration::Panel::info_from_device_connected(state, sh.clone())
@@ -404,7 +404,7 @@ impl Application {
                 matches!(&state.panel, Panel::Test(_, _, _)),
                 "Test Commands",
             )
-            .clicked()
+                .clicked()
             {
                 let ConnectedDevice::DualShock4(_, ds4) = &state.device;
                 let test_data = sh.handle_error(ds4.read_test_data());
